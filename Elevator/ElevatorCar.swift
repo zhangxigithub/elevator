@@ -8,14 +8,24 @@
 
 import UIKit
 
+
+enum ElevatorCarState
+{
+    case Stop
+    case MovingUp
+    case MovingDown
+}
+
+
 class ElevatorCar: UIView {
     
-    /*
-    // Only override drawRect: if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func drawRect(rect: CGRect) {
-    // Drawing code
+    var floor:Int!
+    var state = ElevatorCarState.Stop
+    
+    convenience init(floor:Int,frame: CGRect) {
+        self.init(frame:frame)
+        self.backgroundColor = UIColor.blueColor()
+        self.floor = floor
     }
-    */
     
 }

@@ -8,13 +8,34 @@
 
 import UIKit
 
-class Elevator: UIView {
+class Elevator: UIView,ElevatorControlPanelDelegate {
 
-    let car = ElevatorCar()
+    var car:ElevatorCar!
     
     
     var floorCount:Int!
     var controlPanels = [ElevatorControlPanel]()
+    
+    
+    func up(panel: ElevatorControlPanel)
+    {
+        print("\(panel.floor) need up")
+        
+        let newFrame = frameWithFloor(panel.floor)
+        UIView.animateWithDuration(1) { () -> Void in
+            self.car.frame = newFrame
+        }
+        
+    }
+    func down(panel: ElevatorControlPanel)
+    {
+        print("\(panel.floor) need down")
+        
+        let newFrame = frameWithFloor(panel.floor)
+        UIView.animateWithDuration(2) { () -> Void in
+            self.car.frame = newFrame
+        }
+    }
     
     
     convenience init(numberOfFloor:Int,frame: CGRect) {
@@ -24,7 +45,9 @@ class Elevator: UIView {
 
         self.backgroundColor = UIColor.redColor()
         
-        
+    
+        car = ElevatorCar(floor: 0, frame: CGRectMake(0, 0, self.frame.size.width, self.frame.size.height/CGFloat(floorCount)))
+        self.addSubview(car)
         
         
         for i in 1 ... numberOfFloor
@@ -32,15 +55,15 @@ class Elevator: UIView {
             let floorFrame = frameWithFloor(i)
             let floor = UIView(frame: floorFrame)
             
-            let panel = ElevatorControlPanel(floor: i, frame: CGRectMake(0, 0, 25, 65))
+            let panel = ElevatorControlPanel(floor: i, frame: CGRectMake(0, 0, 30, 65))
             panel.center = CGPointMake(floor.frame.size.width-30, floor.frame.size.height/2)
-            
-            
-            
+            panel.delegate = self
             
             floor.addSubview(panel)
             self.addSubview(floor)
         }
+        
+
     }
     
     

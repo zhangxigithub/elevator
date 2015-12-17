@@ -8,6 +8,12 @@
 
 import UIKit
 
+protocol ElevatorControlPanelDelegate
+{
+    func up(panel:ElevatorControlPanel)
+    func down(panel:ElevatorControlPanel)
+}
+
 class ElevatorControlPanel: UIView {
 
     /*
@@ -19,6 +25,8 @@ class ElevatorControlPanel: UIView {
     */
 
     var floor:Int!
+    var delegate:ElevatorControlPanelDelegate?
+    
     
     convenience init(floor:Int,frame: CGRect) {
         
@@ -45,9 +53,11 @@ class ElevatorControlPanel: UIView {
     
     func up()
     {
+        self.delegate?.up(self)
     }
     
     func down()
     {
+        self.delegate?.down(self)
     }
 }
