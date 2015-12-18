@@ -45,10 +45,15 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
 
     func scanAction()
     {
-//        if car.state != ElevatorCarState.Stop
-//        {
-//            return
-//        }
+        if car.state != ElevatorCarState.Stop
+        {
+            return
+        }
+        if car.gateState != .Close
+        {
+            return
+        }
+        
         if car.direction == .UP
         {
             for i in car.floor...floorCount
@@ -71,11 +76,9 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
                 }
             }
             
-            
-            
         }else
         {
-            for i in car.floor...1
+            for var i = car.floor! ;i>=1 ; i-=1
             {
                 let panel = controlPanels[i-1]
                 if panel.needDown
@@ -84,7 +87,7 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
                     return
                 }
             }
-           for var i = car.floor! ;i>=1 ; i-=1
+           for i in car.floor...floorCount
             {
                 let panel = controlPanels[i-1]
                 if panel.needUp
@@ -135,6 +138,9 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         
         let duration = NSTimeInterval(abs(floor - car.floor))
         
+        self.car.state = .MovingUp
+        self.car.direction = direction
+            
         UIView.animateWithDuration(duration, animations: { () -> Void in
             
             self.car.frame = newFrame
@@ -211,6 +217,7 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
     }
     func arrive(car: ElevatorCar, floor: Int) {
         let panel = controlPanels[floor-1]
+
         if car.direction == .UP
         {
             panel.upButton.selected = false
