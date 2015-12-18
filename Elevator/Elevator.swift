@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Elevator: UIView,ElevatorControlPanelDelegate {
+class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
 
     var car:ElevatorCar!
     
@@ -17,6 +17,8 @@ class Elevator: UIView,ElevatorControlPanelDelegate {
     var controlPanels = [ElevatorControlPanel]()
     
     
+    
+    //MARK: - ElevatorControlPanelDelegate
     func up(panel: ElevatorControlPanel)
     {
         print("\(panel.floor) need up")
@@ -31,10 +33,28 @@ class Elevator: UIView,ElevatorControlPanelDelegate {
     {
         print("\(panel.floor) need down")
         
+        
+    
         let newFrame = frameWithFloor(panel.floor)
-        UIView.animateWithDuration(2) { () -> Void in
+
+        let duration = NSTimeInterval(abs(panel.floor - self.car.floor))
+        
+        UIView.animateWithDuration(duration, animations: { () -> Void in
+            
             self.car.frame = newFrame
+            
+            }) { (finish:Bool) -> Void in
+                
+                if finish
+                {
+                    self.car.openGate()
+                }
         }
+    }
+    
+    //MARK: - ElevatorCarDelegate
+    func didSelectFloor(car: ElevatorCar, floor: Int) {
+       print("need fo to \(floor)")
     }
     
     
@@ -46,7 +66,7 @@ class Elevator: UIView,ElevatorControlPanelDelegate {
         self.backgroundColor = UIColor.redColor()
         
     
-        car = ElevatorCar(floor: 0, frame: CGRectMake(0, 0, self.frame.size.width, self.frame.size.height/CGFloat(floorCount)))
+        car = ElevatorCar(floor: 0,totalFloorCount:numberOfFloor, frame: CGRectMake(0, 0, self.frame.size.width, self.frame.size.height/CGFloat(floorCount)))
         self.addSubview(car)
         
         
