@@ -27,6 +27,11 @@ enum ElevatorCarGateState
 protocol ElevatorCarDelegate
 {
     func didSelectFloor(car:ElevatorCar,floor:Int)
+    func arrive(car:ElevatorCar,floor:Int)
+    func willOpen(car:ElevatorCar)
+    func didOpen(car:ElevatorCar)
+    func willClose(car:ElevatorCar)
+    func didClose(car:ElevatorCar)
 }
 
 class ElevatorCar: UIView {
@@ -34,15 +39,23 @@ class ElevatorCar: UIView {
     var floor:Int!
     var floorCount:Int!
     
+    
+    var direction = ElevatorDirection.UP
     var state = ElevatorCarState.Stop
+
     var leftGate:UIView!
     var rightGate:UIView!
     var gateStatr = ElevatorCarGateState.Close
     var delegate:ElevatorCarDelegate?
     
+    var destinationFloors = [Bool]()
+    
     
     convenience init(floor:Int,totalFloorCount:Int,frame: CGRect) {
         self.init(frame:frame)
+        
+        self.clipsToBounds = true
+        self.userInteractionEnabled = true
         self.backgroundColor = UIColor.whiteColor()
         self.floor = floor
         self.floorCount = totalFloorCount
@@ -50,21 +63,34 @@ class ElevatorCar: UIView {
         
         
         
+        var posotion = CGPointMake(0, 0)
         
         for i in 1...totalFloorCount
         {
+            destinationFloors.append(false)
             let button = UIButton(type: UIButtonType.Custom)
             button.tag = i
-            button.frame = CGRectMake(0, 0, 50, 50)
+            
+
+            if posotion.x  > self.frame.size.width
+            {
+                posotion.x = 0
+                posotion.y += 60
+            }
+            
+            button.frame = CGRectMake(posotion.x, posotion.y, 50, 50)
             button.backgroundColor = UIColor(white: 0.9, alpha: 1)
             button.setTitle(String(i), forState: UIControlState.Normal)
+            button.setTitle(String(format: "s-%d", arguments: [i]), forState: UIControlState.Selected)
             button.addTarget(self, action: Selector("selectFloor:"), forControlEvents: UIControlEvents.TouchUpInside)
+            button.userInteractionEnabled = true
             
             self.addSubview(button)
+            
+            
+            posotion.x += 60
         }
         
-        
-
         
         leftGate  = UIView(frame: CGRectMake(0,0,self.frame.size.width/2,self.frame.size.height))
         leftGate.backgroundColor = UIColor.grayColor()
@@ -79,9 +105,16 @@ class ElevatorCar: UIView {
     
     func selectFloor(button:UIButton)
     {
+        destinationFloors[button.tag-1] = true
+        button.selected = true
         self.delegate?.didSelectFloor(self, floor: button.tag)
     }
-    
+    func arrive(floor:Int)
+    {
+        self.floor = floor
+        destinationFloors[floor-1] = false
+        self.delegate?.arrive(self,floor:floor)
+    }
 
     func openGate()
     {
@@ -90,16 +123,26 @@ class ElevatorCar: UIView {
         
         
         gateStatr = ElevatorCarGateState.Opennig
-        
+        self.delegate?.willOpen(self)
         UIView.animateWithDuration(1, animations: { () -> Void in
             
             self.leftGate.frame  = leftGateOpenFrame
             self.rightGate.frame = rightGateOpenFrame
             
             }) { (finish:Bool) -> Void in
+                self.delegate?.didOpen(self)
                 self.gateStatr = ElevatorCarGateState.Open
+                self.closeAfter(3)
         }
-        
+    }
+    func closeAfter(time:UInt64)
+    {
+        let wait = dispatch_time(DISPATCH_TIME_NOW, (Int64)(time * NSEC_PER_SEC))
+
+        dispatch_after(wait, dispatch_get_main_queue()) { () -> Void in
+            
+            self.closeGate()
+        }
     }
     
     func closeGate()
@@ -109,6 +152,7 @@ class ElevatorCar: UIView {
         
 
         self.gateStatr = ElevatorCarGateState.Closing
+        self.delegate?.willClose(self)
         
         UIView.animateWithDuration(1, animations: { () -> Void in
             self.leftGate.frame  = leftGateCloseFrame
@@ -116,6 +160,7 @@ class ElevatorCar: UIView {
             }) { (finish:Bool) -> Void in
                 
                 self.gateStatr = ElevatorCarGateState.Close
+                self.delegate?.didClose(self)
         }
     }
     

@@ -28,36 +28,55 @@ class ElevatorControlPanel: UIView {
     var delegate:ElevatorControlPanelDelegate?
     
     
+    var needUp   = false
+    var needDown = false
+    
+    
+    var upButton:UIButton!
+    var downButton:UIButton!
+    
     convenience init(floor:Int,frame: CGRect) {
         
         self.init(frame:frame)
         
+        self.backgroundColor = UIColor.whiteColor()
+        self.layer.borderColor = UIColor(white: 0.9, alpha: 1).CGColor
+        self.layer.borderWidth = 1
+        
+        
         self.floor = floor
+
+        let space:CGFloat = 2
+        let width = self.frame.size.width - space*2
+
         
-        let width = self.frame.size.width
+        upButton = UIButton(type: UIButtonType.Custom)
+        upButton.frame = CGRectMake(space, space, width, width)
+        upButton.setImage(UIImage(named: "up"), forState: UIControlState.Normal)
+        upButton.setImage(UIImage(named: "up_s"), forState: UIControlState.Selected)
+        upButton.addTarget(self, action: Selector("up:"), forControlEvents: UIControlEvents.TouchUpInside)
+        self.addSubview(upButton)
         
-        let up = UIButton(type: UIButtonType.Custom)
-        up.frame = CGRectMake(0, 0, width, width)
-        up.setImage(UIImage(named: "up"), forState: UIControlState.Normal)
-        up.setImage(UIImage(named: "up_s"), forState: UIControlState.Selected)
-        up.addTarget(self, action: Selector("up"), forControlEvents: UIControlEvents.TouchUpInside)
-        self.addSubview(up)
-        
-        let down = UIButton(type: UIButtonType.Custom)
-        down.frame = CGRectMake(0, self.frame.size.height-width, width, width)
-        down.setImage(UIImage(named: "down"), forState: UIControlState.Normal)
-        down.setImage(UIImage(named: "down_s"), forState: UIControlState.Selected)
-        down.addTarget(self, action: Selector("down"), forControlEvents: UIControlEvents.TouchUpInside)
-        self.addSubview(down)
+        downButton = UIButton(type: UIButtonType.Custom)
+        downButton.frame = CGRectMake(space, self.frame.size.height-width-space, width, width)
+        downButton.setImage(UIImage(named: "down"), forState: UIControlState.Normal)
+        downButton.setImage(UIImage(named: "down_s"), forState: UIControlState.Selected)
+        downButton.addTarget(self, action: Selector("down:"), forControlEvents: UIControlEvents.TouchUpInside)
+        self.addSubview(downButton)
     }
     
-    func up()
+    func up(button:UIButton)
     {
+        button.selected = true
+        needUp = true
         self.delegate?.up(self)
+
     }
     
-    func down()
+    func down(button:UIButton)
     {
+        button.selected = true
+        needDown = true
         self.delegate?.down(self)
     }
 }
