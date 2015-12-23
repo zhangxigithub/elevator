@@ -15,36 +15,30 @@ enum ElevatorDirection
 {
     case UP
     case DOWN
+    case AnyDirection
 }
 
-class ElevatorAction
-{
-    var directon:ElevatorDirection!
-    var floor:Int!
-    //var destinationFloor:Int!
-}
+
 
 class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
 
     var car:ElevatorCar!
     var floorCount:Int!
-    
-
-    
     var controlPanels = [ElevatorControlPanel]()
-    var actions = [ElevatorAction]()
-    var currentAction:ElevatorAction?
+    
+
     
     
-    
-    
-    let controlPanelWidth :CGFloat = 30
-    let controlPanelHeight:CGFloat = 65
+    let controlPanelWidth :CGFloat = 80
+    let controlPanelHeight:CGFloat = 120
     
     
 
-    func scanAction()
+    func scan()
     {
+        print("scanAction.........")
+        
+        //当电梯停止的时候 或者 门没关的时候不移动电梯
         if car.state != ElevatorCarState.Stop
         {
             return
@@ -53,117 +47,156 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         {
             return
         }
+
         
-        if car.direction == .UP
+        //当待机状态时，选择最近的目的地
+        if car.direction == .AnyDirection
         {
-            for i in car.floor...floorCount
+            if let p = latestRequest(car.floor)
             {
-                let panel = controlPanels[i-1]
-                if panel.needUp
-                {
-                    moveTo(panel.floor,direction:.UP)
-                    return
-                }
+                look(p)
+                return
             }
-            
-            for var i = car.floor! ;i>=1 ; i-=1
-            {
-                let panel = controlPanels[i-1]
-                if panel.needDown
-                {
-                    moveTo(panel.floor,direction:.DOWN)
-                    return
-                }
-            }
-            
-        }else
-        {
-            for var i = car.floor! ;i>=1 ; i-=1
-            {
-                let panel = controlPanels[i-1]
-                if panel.needDown
-                {
-                    moveTo(panel.floor,direction:.DOWN)
-                    return
-                }
-            }
-           for i in car.floor...floorCount
-            {
-                let panel = controlPanels[i-1]
-                if panel.needUp
-                {
-                    moveTo(panel.floor,direction:.UP)
-                    return
-                }
-            }
-        }
-    }
-    func scanCarAction()
-    {
-        if car.state != ElevatorCarState.Stop
-        {
             return
         }
-        if car.direction == .UP
+        
+        //1.先扫描同方向上的请求
+        if let p = sameDirectionRequest(car.floor, direction: car.direction)
         {
-            
-            if check(car.floor, to: floorCount, direction: .UP)
-            {
-                return
-            }
-            if check(floorCount, to: 1, direction: .DOWN)
-            {
-                return
-            }
-
+            look(p)
+            return
+        }
+        //2.同方向上没有请求，改变方向
+        changeDirection()
+        //3.扫描反方向的请求
+        if let p = opsiteDirectionRequest(car.floor, direction: car.direction)
+        {
+            look(p)
+            return
+        }
+        print("待机")
+        car.direction = .AnyDirection
+    }
+    func look(panel:ElevatorControlPanel)
+    {
+        if panel.destination == true
+        {//电梯内有人按楼层，优先到达该楼层
+            moveTo(panel.floor, direction:car.direction)
         }else
-        {
-            if check(car.floor, to: 1, direction: .DOWN)
-            {
-                return
-            }
-            if check(1, to: floorCount, direction: .UP)
-            {
-                return
-            }
+        {//电梯外有人请求电梯，次优先
+            moveTo(panel.floor, direction:car.direction)
         }
     }
     
-    
-    func check(from:Int,to:Int,direction:ElevatorDirection) -> Bool
+
+
+
+
+
+    //同方向最近的的请求
+    func sameDirectionRequest(floor:Int,direction:ElevatorDirection) -> ElevatorControlPanel?
+    {
+        
+        if direction == .UP
+        {
+            for i in floor...floorCount
+            {
+                let p = panel(floor: i)
+                if p.needUp == true || p.destination == true
+                {
+                    return p
+                }
+            }
+        }else
+        {
+            for var i = floor ;i>=1 ; i-=1
+            {
+                let p = panel(floor: i)
+                if p.needDown == true || p.destination == true
+                {
+                    return p
+                }
+            }
+        }
+        return nil
+    }
+    //相反方向最近的的请求
+    func opsiteDirectionRequest(floor:Int,direction:ElevatorDirection) -> ElevatorControlPanel?
     {
         if direction == .UP
         {
-            for i in from...to
+            for i in 1...floorCount
             {
-                let needStop = car.destinationFloors[i-1]
-                if needStop
+                let p = panel(floor: i)
+                if p.needUp == true || p.destination == true
                 {
-                    moveTo(i,direction:.UP)
-                    return true
+                    return p
                 }
             }
         }else
         {
-            for var i = from ;i>=to ; i-=1
+            for var i = floorCount! ;i>=1 ; i-=1
             {
-                let needStop = car.destinationFloors[i-1]
-                if needStop
+                let p = panel(floor: i)
+                if p.needDown == true || p.destination == true
                 {
-                    moveTo(i,direction:.DOWN)
-                    return true
+                    return p
                 }
             }
         }
-        return false
+        return nil
     }
+    //同方向最近的的请求
+    func latestRequest(floor:Int) -> ElevatorControlPanel?
+    {
+        
+        var finish    = false
+        var downIndex = floor-1
+        var upIndex   = floor+1
+
+        while !finish
+        {
+            finish = true
+            if upIndex <= floorCount
+            {
+                finish = false
+                let panel = self.panel(floor: upIndex)
+                if panel.destination == true || panel.needUp == true || panel.needDown == true
+                {
+                    self.car.direction = .UP
+                    return panel
+                }
+            }
+            upIndex++
+            if downIndex >= 0
+            {
+                finish = false
+                let panel = self.panel(floor: downIndex)
+                if panel.destination == true || panel.needUp == true || panel.needDown == true
+                {
+                    self.car.direction = .DOWN
+                    return panel
+                }
+            }
+            downIndex--
+        }
+        
+        
+
+        return nil
+    }
+
+    
+    
+    
     
     func moveTo(floor:Int,direction:ElevatorDirection)
     {
+        print("moveTo \(floor)")
         let newFrame = carFrame(floor)
         
         let duration = NSTimeInterval(abs(floor - car.floor))
-        
+        print("duration \(duration)")
         self.car.state = .MovingUp
         self.car.direction = direction
             
@@ -176,8 +209,10 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
                 
                 self.car.arrive(floor)
                 
-                let panel = self.controlPanels[floor-1]
+                let panel = self.panel(floor: floor)
 
+                //panel.needUp   = false
+                //panel.needDown   = false
                 if direction == .UP
                 {
                     panel.needUp   = false
@@ -185,28 +220,12 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
                 {
                     panel.needDown = false
                 }
-                self.car.openGate()
+                
                 
         }
     }
     
-//    func runAction(action:ElevatorAction)
-//    {
-//
-//        currentAction = action
-//        direction = (action.floor > car.floor) ? .UP : .DOWN
-//       
-//    
-//        moveTo(action.floor)
-//    }
-//    
-    
-    
-    
-//    
-//    func findLatestSameDirectionAction() -> ElevatorAction?
-//    {
-//    }
+
 
     
     
@@ -226,24 +245,40 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
     //MARK: - ElevatorControlPanelDelegate
     func up(panel: ElevatorControlPanel)
     {
-        print("\(panel.floor) need up")
-        scanAction()
+        print("\(panel.floor)楼 need up")
+        if car.direction == .AnyDirection
+        {
+            car.direction = .UP
+        }
+        scan()
     }
     func down(panel: ElevatorControlPanel)
     {
-        print("\(panel.floor) need down")
-        scanAction()
+        print("\(panel.floor)楼 need down")
+        if car.direction == .AnyDirection
+        {
+            car.direction = .DOWN
+        }
+        scan()
     }
     
     //MARK: - ElevatorCarDelegate
     func didSelectFloor(car: ElevatorCar, floor: Int) {
-       print("need fo to \(floor)")
+        print("need fo to \(floor)")
+        panel(floor: floor).destination = true
+        if car.direction == .AnyDirection
+        {
+            self.car.direction = (floor > car.floor) ? .UP : .DOWN
+        }
         
         
     }
+    
     func arrive(car: ElevatorCar, floor: Int) {
-        let panel = controlPanels[floor-1]
-
+        
+        let panel = self.panel(floor: floor)
+        panel.destination = false
+        
         if car.direction == .UP
         {
             panel.upButton.selected = false
@@ -268,11 +303,12 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
     func didClose(car:ElevatorCar)
     {
         print("didClose 当前楼层\(car.floor)")
-        scanAction()
-        scanCarAction()
+        scan()
     }
     
     
+    
+    //MARK: - ===
     convenience init(numberOfFloor:Int,frame: CGRect) {
 
         self.init(frame:frame)
@@ -282,6 +318,7 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
     
         car = ElevatorCar(floor: 1,totalFloorCount:numberOfFloor, frame: carFrame(1))
         car.delegate = self
+        car.direction = .AnyDirection
         self.addSubview(car)
         
         
@@ -302,6 +339,11 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
     }
     
 
+    func panel(floor floor:Int)->ElevatorControlPanel
+    {
+        return controlPanels[floor-1]
+    }
+    
     func controlPanelFrame(floor:Int) -> CGRect
     {
         let floorHeight = (self.frame.size.height / CGFloat(floorCount))

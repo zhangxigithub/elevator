@@ -16,25 +16,32 @@ protocol ElevatorControlPanelDelegate
 
 class ElevatorControlPanel: UIView {
 
-    /*
-    // Only override drawRect: if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func drawRect(rect: CGRect) {
-        // Drawing code
-    }
-    */
-
-    var floor:Int!
     var delegate:ElevatorControlPanelDelegate?
     
     
-    var needUp   = false
-    var needDown = false
     
+    var floor:Int!  //楼层号
     
     var upButton:UIButton!
     var downButton:UIButton!
     
+    var needUp      = false   //按下上行
+        {
+        didSet{
+            upButton.selected = needUp
+        }
+        
+    }
+    var needDown    = false   //按下下行
+        {
+        didSet{
+            downButton.selected = needUp
+        }
+    }
+    
+    var destination = false   //目的地楼层，电梯内有人选了该楼层
+    
+
     convenience init(floor:Int,frame: CGRect) {
         
         self.init(frame:frame)
@@ -47,18 +54,19 @@ class ElevatorControlPanel: UIView {
         self.floor = floor
 
         let space:CGFloat = 2
-        let width = self.frame.size.width - space*2
+        let width  = self.frame.size.width  - space*2
+        let height = (self.frame.size.height - space)/2
 
         
         upButton = UIButton(type: UIButtonType.Custom)
-        upButton.frame = CGRectMake(space, space, width, width)
+        upButton.frame = CGRectMake(space, space, width, height)
         upButton.setImage(UIImage(named: "up"), forState: UIControlState.Normal)
         upButton.setImage(UIImage(named: "up_s"), forState: UIControlState.Selected)
         upButton.addTarget(self, action: Selector("up:"), forControlEvents: UIControlEvents.TouchUpInside)
         self.addSubview(upButton)
         
         downButton = UIButton(type: UIButtonType.Custom)
-        downButton.frame = CGRectMake(space, self.frame.size.height-width-space, width, width)
+        downButton.frame = CGRectMake(space,height+space, width, height)
         downButton.setImage(UIImage(named: "down"), forState: UIControlState.Normal)
         downButton.setImage(UIImage(named: "down_s"), forState: UIControlState.Selected)
         downButton.addTarget(self, action: Selector("down:"), forControlEvents: UIControlEvents.TouchUpInside)
@@ -67,16 +75,21 @@ class ElevatorControlPanel: UIView {
     
     func up(button:UIButton)
     {
-        button.selected = true
-        needUp = true
-        self.delegate?.up(self)
+        //dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            needUp = true
+            self.upButton.selected = true
+            self.delegate?.up(self)
+        //}
+
 
     }
     
     func down(button:UIButton)
     {
-        button.selected = true
-        needDown = true
-        self.delegate?.down(self)
+        //dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            needDown = true
+        self.downButton.selected = true
+            self.delegate?.down(self)
+        //}
     }
 }

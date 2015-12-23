@@ -48,7 +48,7 @@ class ElevatorCar: UIView {
     var gateState = ElevatorCarGateState.Close
     var delegate:ElevatorCarDelegate?
     
-    var destinationFloors = [Bool]()
+    //var destinationFloors = [Bool]()
     var buttons = [UIButton]()
     
     convenience init(floor:Int,totalFloorCount:Int,frame: CGRect) {
@@ -69,7 +69,7 @@ class ElevatorCar: UIView {
         
         for i in 1...totalFloorCount
         {
-            destinationFloors.append(false)
+            //destinationFloors.append(false)
             let button = UIButton(type: UIButtonType.Custom)
             button.tag = i
             
@@ -83,11 +83,9 @@ class ElevatorCar: UIView {
             button.setBackgroundImage(UIImage(named: "button_bg"), forState: UIControlState.Normal)
             button.frame = CGRectMake(posotion.x, posotion.y, 50, 50)
             button.titleLabel?.font = UIFont(name: "Helvetica-Bold", size: 30)
-            //button.backgroundColor = UIColor(white: 0.9, alpha: 1)
             button.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
             button.setTitleColor(UIColor.redColor(), forState: UIControlState.Selected)
             button.setTitle(String(i), forState: UIControlState.Normal)
-            //button.setTitle(String(format: "s-%d", arguments: [i]), forState: UIControlState.Selected)
             button.addTarget(self, action: Selector("selectFloor:"), forControlEvents: UIControlEvents.TouchUpInside)
             button.userInteractionEnabled = true
             
@@ -112,7 +110,7 @@ class ElevatorCar: UIView {
     
     func selectFloor(button:UIButton)
     {
-        destinationFloors[button.tag-1] = true
+
         button.selected = true
         self.delegate?.didSelectFloor(self, floor: button.tag)
     }
@@ -121,8 +119,10 @@ class ElevatorCar: UIView {
         self.state = .Stop
         self.floor = floor
         buttons[floor-1].selected = false
-        destinationFloors[floor-1] = false
+        
         self.delegate?.arrive(self,floor:floor)
+        
+        self.openGate()
     }
 
     func openGate()
