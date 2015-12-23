@@ -49,7 +49,7 @@ class ElevatorCar: UIView {
     var delegate:ElevatorCarDelegate?
     
     var destinationFloors = [Bool]()
-    
+    var buttons = [UIButton]()
     
     convenience init(floor:Int,totalFloorCount:Int,frame: CGRect) {
         self.init(frame:frame)
@@ -61,6 +61,8 @@ class ElevatorCar: UIView {
         self.floorCount = totalFloorCount
         
         
+        let tap = UITapGestureRecognizer(target: self, action: Selector("tap"))
+        self.addGestureRecognizer(tap)
         
         
         var posotion = CGPointMake(0, 0)
@@ -89,6 +91,7 @@ class ElevatorCar: UIView {
             button.addTarget(self, action: Selector("selectFloor:"), forControlEvents: UIControlEvents.TouchUpInside)
             button.userInteractionEnabled = true
             
+            buttons.append(button)
             self.addSubview(button)
             
             
@@ -117,6 +120,7 @@ class ElevatorCar: UIView {
     {
         self.state = .Stop
         self.floor = floor
+        buttons[floor-1].selected = false
         destinationFloors[floor-1] = false
         self.delegate?.arrive(self,floor:floor)
     }
@@ -168,5 +172,15 @@ class ElevatorCar: UIView {
                 self.delegate?.didClose(self)
         }
     }
+    
+    
+    func tap()
+    {
+        if gateState == ElevatorCarGateState.Close
+        {
+            self.openGate()
+        }
+    }
+    
     
 }

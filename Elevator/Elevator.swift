@@ -106,31 +106,57 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         }
         if car.direction == .UP
         {
-            for i in car.floor...floorCount
+            
+            if check(car.floor, to: floorCount, direction: .UP)
             {
-                let needStop = car.destinationFloors[i-1]
-                if needStop
-                {
-                    moveTo(i,direction:.UP)
-                    return
-                }
+                return
             }
+            if check(floorCount, to: 1, direction: .DOWN)
+            {
+                return
+            }
+
         }else
         {
-            for i in car.floor...1
+            if check(car.floor, to: 1, direction: .DOWN)
             {
-                let needStop = car.destinationFloors[i-1]
-                if needStop
-                {
-                    moveTo(i,direction:.DOWN)
-                    return
-                }
+                return
+            }
+            if check(1, to: floorCount, direction: .UP)
+            {
+                return
             }
         }
     }
     
     
-    
+    func check(from:Int,to:Int,direction:ElevatorDirection) -> Bool
+    {
+        if direction == .UP
+        {
+            for i in from...to
+            {
+                let needStop = car.destinationFloors[i-1]
+                if needStop
+                {
+                    moveTo(i,direction:.UP)
+                    return true
+                }
+            }
+        }else
+        {
+            for var i = from ;i>=to ; i-=1
+            {
+                let needStop = car.destinationFloors[i-1]
+                if needStop
+                {
+                    moveTo(i,direction:.DOWN)
+                    return true
+                }
+            }
+        }
+        return false
+    }
     
     func moveTo(floor:Int,direction:ElevatorDirection)
     {
