@@ -43,8 +43,8 @@ class ElevatorCar: UIView {
     var direction = ElevatorDirection.UP
     var state = ElevatorCarState.Stop
 
-    var leftGate:UIView!
-    var rightGate:UIView!
+    var leftGate:UIImageView!
+    var rightGate:UIImageView!
     var gateState = ElevatorCarGateState.Close
     var delegate:ElevatorCarDelegate?
     
@@ -73,8 +73,8 @@ class ElevatorCar: UIView {
             let button = UIButton(type: UIButtonType.Custom)
             button.tag = i
             
-            let width:CGFloat = 50 //按钮宽度，高度
-            let space:CGFloat = 4  //按钮之间的间隔
+            let width:CGFloat = 44 //按钮宽度，高度
+            let space:CGFloat = 3  //按钮之间的间隔
 
             if posotion.x + width  > self.frame.size.width
             {
@@ -99,12 +99,15 @@ class ElevatorCar: UIView {
         }
         
         
-        leftGate  = UIView(frame: CGRectMake(0,0,self.frame.size.width/2,self.frame.size.height))
-        leftGate.backgroundColor = UIColor.grayColor()
+        leftGate  = UIImageView(frame: CGRectMake(0,0,self.frame.size.width/2,self.frame.size.height))
+        leftGate.userInteractionEnabled = true
+        leftGate.image = UIImage(named: "door_left")
         self.addSubview(leftGate)
         
-        rightGate = UIView(frame: CGRectMake(self.frame.size.width/2,0,self.frame.size.width/2,self.frame.size.height))
-        rightGate.backgroundColor = UIColor.grayColor()
+        
+        rightGate = UIImageView(frame: CGRectMake(self.frame.size.width/2,0,self.frame.size.width/2,self.frame.size.height))
+        rightGate.userInteractionEnabled = true
+        rightGate.image = UIImage(named: "door_right")
         self.addSubview(rightGate)
         
 

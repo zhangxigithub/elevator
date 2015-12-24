@@ -151,7 +151,7 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
     {
         
         var finish    = false
-        var downIndex = floor-1
+        var downIndex = floor
         var upIndex   = floor+1
 
         while !finish
@@ -216,11 +216,16 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
                 if direction == .UP
                 {
                     panel.needUp   = false
-                }else
+                }
+                if direction == .DOWN
                 {
                     panel.needDown = false
                 }
-                
+                if direction == .AnyDirection
+                {
+                    panel.needUp   = false
+                    panel.needDown = false
+                }
                 
         }
     }
@@ -267,10 +272,10 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
     func didSelectFloor(car: ElevatorCar, floor: Int) {
         print("need fo to \(floor)")
         panel(floor: floor).destination = true
-        if car.direction == .AnyDirection
-        {
-            self.car.direction = (floor > car.floor) ? .UP : .DOWN
-        }
+//        if car.direction == .AnyDirection
+//        {
+//            self.car.direction = (floor > car.floor) ? .UP : .DOWN
+//        }
         
         
     }
@@ -315,14 +320,6 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         self.init(frame:frame)
         floorCount = numberOfFloor
 
-        
-    
-        car = ElevatorCar(floor: 1,totalFloorCount:numberOfFloor, frame: carFrame(1))
-        car.delegate = self
-        car.direction = .AnyDirection
-        self.addSubview(car)
-        
-        
         for i in 1 ... numberOfFloor
         {
             let floorFrame = self.floorFrame(i)
@@ -336,7 +333,7 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
             
             
             let line = UIView(frame: CGRectMake(floorFrame.origin.x,floorFrame.origin.y+floorFrame.size.height-0.5,floorFrame.size.width,0.5))
-            line.backgroundColor = UIColor(white: 0.5, alpha: 1)
+            line.backgroundColor = UIColor(white: 0.8, alpha: 1)
             self.addSubview(line)
             
             
@@ -348,6 +345,11 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         }
         
 
+        car = ElevatorCar(floor: 1,totalFloorCount:numberOfFloor, frame: carFrame(1))
+        car.delegate = self
+        car.direction = .AnyDirection
+        self.addSubview(car)
+        
     }
     
 
@@ -356,7 +358,7 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         return controlPanels[floor-1]
     }
     
-    let controlPanelWidth :CGFloat = 60
+    let controlPanelWidth :CGFloat = 64
     let controlPanelHeight:CGFloat = 120
     
     func controlPanelFrame(floor:Int) -> CGRect
@@ -378,7 +380,7 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         let floorHeight = (self.frame.size.height / CGFloat(floorCount))
         let y = self.frame.size.height - CGFloat(floor)*floorHeight
         
-        return CGRectMake(20, y,self.frame.size.width-controlPanelWidth-20, floorHeight)
+        return CGRectMake(20, y,self.frame.size.width-controlPanelWidth-20, floorHeight-0.5)
     }
 
     
