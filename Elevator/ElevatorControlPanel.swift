@@ -46,9 +46,9 @@ class ElevatorControlPanel: UIView {
         
         self.init(frame:frame)
         
-        self.backgroundColor = UIColor.whiteColor()
-        self.layer.borderColor = UIColor(white: 0.9, alpha: 1).CGColor
-        self.layer.borderWidth = 1
+        //self.backgroundColor = UIColor.whiteColor()
+        //self.layer.borderColor = UIColor(white: 0.9, alpha: 1).CGColor
+        //self.layer.borderWidth = 1
         
         
         self.floor = floor

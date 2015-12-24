@@ -29,8 +29,7 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
 
     
     
-    let controlPanelWidth :CGFloat = 80
-    let controlPanelHeight:CGFloat = 120
+
     
     
 
@@ -71,6 +70,7 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         //3.扫描反方向的请求
         if let p = opsiteDirectionRequest(car.floor, direction: car.direction)
         {
+            
             look(p)
             return
         }
@@ -168,7 +168,7 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
                 }
             }
             upIndex++
-            if downIndex >= 0
+            if downIndex >= 1
             {
                 finish = false
                 let panel = self.panel(floor: downIndex)
@@ -235,9 +235,10 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         if car.direction == .UP
         {
             car.direction = .DOWN
-        }else
+        }
+        else if car.direction == .DOWN
         {
-            car.direction == .UP
+            car.direction = .UP
         }
     }
     
@@ -324,15 +325,26 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         
         for i in 1 ... numberOfFloor
         {
-            let floor = UIView(frame: controlPanelFrame(i))
+            let floorFrame = self.floorFrame(i)
             
-            let panel = ElevatorControlPanel(floor: i, frame: CGRectMake(0, 0, controlPanelWidth, controlPanelHeight))
-            panel.center = CGPointMake(controlPanelWidth/2, floor.frame.size.height/2)
+            let floorLabel = UILabel(frame: CGRectMake(floorFrame.origin.x,floorFrame.origin.y,80,22))
+            floorLabel.userInteractionEnabled = false
+            floorLabel.text = String(i)
+            floorLabel.textColor = UIColor.redColor()
+            floorLabel.font = UIFont.systemFontOfSize(20)
+            self.addSubview(floorLabel)
+            
+            
+            let line = UIView(frame: CGRectMake(floorFrame.origin.x,floorFrame.origin.y+floorFrame.size.height-0.5,floorFrame.size.width,0.5))
+            line.backgroundColor = UIColor(white: 0.5, alpha: 1)
+            self.addSubview(line)
+            
+            
+            let panel = ElevatorControlPanel(floor: i, frame: controlPanelFrame(i))
             panel.delegate = self
             
             self.controlPanels.append(panel)
-            floor.addSubview(panel)
-            self.addSubview(floor)
+            self.addSubview(panel)
         }
         
 
@@ -343,6 +355,9 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
     {
         return controlPanels[floor-1]
     }
+    
+    let controlPanelWidth :CGFloat = 60
+    let controlPanelHeight:CGFloat = 120
     
     func controlPanelFrame(floor:Int) -> CGRect
     {
@@ -363,7 +378,7 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         let floorHeight = (self.frame.size.height / CGFloat(floorCount))
         let y = self.frame.size.height - CGFloat(floor)*floorHeight
         
-        return CGRectMake(0, y,self.frame.size.width-controlPanelWidth, floorHeight)
+        return CGRectMake(20, y,self.frame.size.width-controlPanelWidth-20, floorHeight)
     }
 
     

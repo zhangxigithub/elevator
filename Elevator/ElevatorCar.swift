@@ -73,16 +73,18 @@ class ElevatorCar: UIView {
             let button = UIButton(type: UIButtonType.Custom)
             button.tag = i
             
+            let width:CGFloat = 50 //按钮宽度，高度
+            let space:CGFloat = 4  //按钮之间的间隔
 
-            if posotion.x + 50  > self.frame.size.width
+            if posotion.x + width  > self.frame.size.width
             {
                 posotion.x = 0
-                posotion.y += 60
+                posotion.y += (width+space)
             }
             
             button.setBackgroundImage(UIImage(named: "button_bg"), forState: UIControlState.Normal)
-            button.frame = CGRectMake(posotion.x, posotion.y, 50, 50)
-            button.titleLabel?.font = UIFont(name: "Helvetica-Bold", size: 30)
+            button.frame = CGRectMake(posotion.x, posotion.y, width, width)
+            button.titleLabel?.font = UIFont(name: "Helvetica-Bold", size: width*0.6)
             button.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
             button.setTitleColor(UIColor.redColor(), forState: UIControlState.Selected)
             button.setTitle(String(i), forState: UIControlState.Normal)
@@ -93,7 +95,7 @@ class ElevatorCar: UIView {
             self.addSubview(button)
             
             
-            posotion.x += 60
+            posotion.x += (width+space)
         }
         
         
