@@ -340,6 +340,16 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
             let panel = ElevatorControlPanel(floor: i, frame: controlPanelFrame(i))
             panel.delegate = self
             
+            if i == 1
+            {
+                panel.isBottomFloor()
+            }
+            if i == numberOfFloor
+            {
+                panel.isTopFloor()
+            }
+            
+            
             self.controlPanels.append(panel)
             self.addSubview(panel)
         }

@@ -18,6 +18,7 @@ class ViewController: UIViewController {
         scrollView.contentSize = CGSizeMake(scrollView.frame.size.width, 1200)
         self.view.addSubview(scrollView)
         
+        
         let elevator = Elevator(numberOfFloor: 10, frame: CGRectMake(0, 0,scrollView.contentSize.width, scrollView.contentSize.height))
         scrollView.addSubview(elevator)
         

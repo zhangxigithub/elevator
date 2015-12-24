@@ -72,6 +72,14 @@ class ElevatorControlPanel: UIView {
         downButton.addTarget(self, action: Selector("down:"), forControlEvents: UIControlEvents.TouchUpInside)
         self.addSubview(downButton)
     }
+    func isBottomFloor()
+    {
+        downButton.hidden = true
+    }
+    func isTopFloor()
+    {
+        upButton.hidden = true
+    }
     
     func up(button:UIButton)
     {
