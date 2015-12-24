@@ -33,9 +33,10 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
     
     
 
+    //MARK: - 电梯控制器
     func scan()
     {
-        print("scanAction.........")
+        print("scan.........")
         
         //当电梯停止的时候 或者 门没关的时候不移动电梯
         if car.state != ElevatorCarState.Stop
@@ -51,7 +52,7 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         //当待机状态时，选择最近的目的地
         if car.direction == .AnyDirection
         {
-            if let p = latestRequest(car.floor)
+            if let p = anyDirectionRequest(car.floor)
             {
                 look(p)
                 return
@@ -70,13 +71,13 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         //3.扫描反方向的请求
         if let p = opsiteDirectionRequest(car.floor, direction: car.direction)
         {
-            
             look(p)
             return
         }
-        print("待机")
+        print("待机..运行方向改为任意方向")
         car.direction = .AnyDirection
     }
+    
     func look(panel:ElevatorControlPanel)
     {
         if panel.destination == true
@@ -90,9 +91,8 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
     
 
 
-
-
-
+    
+    //MARK: - 查找某个方向上的请求
     //同方向最近的的请求
     func sameDirectionRequest(floor:Int,direction:ElevatorDirection) -> ElevatorControlPanel?
     {
@@ -146,8 +146,8 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         }
         return nil
     }
-    //同方向最近的的请求
-    func latestRequest(floor:Int) -> ElevatorControlPanel?
+    //任意方向最近的的请求
+    func anyDirectionRequest(floor:Int) -> ElevatorControlPanel?
     {
         
         var finish    = false
@@ -186,6 +186,8 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         return nil
     }
 
+    
+    
     
     
     
@@ -268,16 +270,12 @@ class Elevator: UIView,ElevatorControlPanelDelegate,ElevatorCarDelegate {
         scan()
     }
     
+    
+    
     //MARK: - ElevatorCarDelegate
     func didSelectFloor(car: ElevatorCar, floor: Int) {
         print("need fo to \(floor)")
         panel(floor: floor).destination = true
-//        if car.direction == .AnyDirection
-//        {
-//            self.car.direction = (floor > car.floor) ? .UP : .DOWN
-//        }
-        
-        
     }
     
     func arrive(car: ElevatorCar, floor: Int) {
