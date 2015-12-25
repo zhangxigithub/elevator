@@ -22,6 +22,10 @@ class ViewController: UIViewController {
         let elevator = Elevator(numberOfFloor: 10, frame: CGRectMake(0, 0,scrollView.contentSize.width, scrollView.contentSize.height))
         scrollView.addSubview(elevator)
         
+        
+        EleveotrManager.sharedManager.start()
+        
+
     }
 
 

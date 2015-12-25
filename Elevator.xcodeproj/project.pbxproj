@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		334210AB1C2B91290041EA8D /* EleveotrManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 334210AA1C2B91290041EA8D /* EleveotrManager.swift */; };
 		33C810BA1C22A298004BB1C3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33C810B91C22A298004BB1C3 /* AppDelegate.swift */; };
 		33C810BC1C22A298004BB1C3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33C810BB1C22A298004BB1C3 /* ViewController.swift */; };
 		33C810BF1C22A298004BB1C3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 33C810BD1C22A298004BB1C3 /* Main.storyboard */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		334210AA1C2B91290041EA8D /* EleveotrManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EleveotrManager.swift; sourceTree = "<group>"; };
 		33C810B61C22A297004BB1C3 /* Elevator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Elevator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33C810B91C22A298004BB1C3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		33C810BB1C22A298004BB1C3 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -62,6 +64,7 @@
 			children = (
 				33C810B91C22A298004BB1C3 /* AppDelegate.swift */,
 				33C810BB1C22A298004BB1C3 /* ViewController.swift */,
+				334210AA1C2B91290041EA8D /* EleveotrManager.swift */,
 				33C810CD1C22A380004BB1C3 /* Elevator.swift */,
 				33C810CB1C22A358004BB1C3 /* ElevatorCar.swift */,
 				33C810CF1C22A3E4004BB1C3 /* ElevatorControlPanel.swift */,
@@ -147,6 +150,7 @@
 				33C810CC1C22A358004BB1C3 /* ElevatorCar.swift in Sources */,
 				33C810BC1C22A298004BB1C3 /* ViewController.swift in Sources */,
 				33C810BA1C22A298004BB1C3 /* AppDelegate.swift in Sources */,
+				334210AB1C2B91290041EA8D /* EleveotrManager.swift in Sources */,
 				33C810D01C22A3E4004BB1C3 /* ElevatorControlPanel.swift in Sources */,
 				33C810CE1C22A380004BB1C3 /* Elevator.swift in Sources */,
 			);
